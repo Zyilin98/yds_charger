@@ -1347,7 +1347,7 @@ static void oledSettingSurface(void)
       }
       break;
     case 7:
-      current_selection = u8g2_UserInterfaceSelectionList(&u8g2, "关于", 1, "版权所有\n伦敦烟云smog\nModified by Ktx\n<-返回");
+      current_selection = u8g2_UserInterfaceSelectionList(&u8g2, "关于", 1, "版权所有\n伦敦烟云smog\nModified by Ktx\nFix by Zyilin98\n<-返回");
       break;
     case 8:
       esp_restart();

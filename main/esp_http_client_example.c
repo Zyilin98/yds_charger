@@ -206,16 +206,16 @@ static void http_rest_with_url(void)
     char URL[50];
     if(city[0] == '\0')
     {
-        sprintf(URL, "http://www.yiketianqi.com/free/day?appid=%s&appsecret=%s&unescape=1", appid, appsecret);
+        sprintf(URL, "http://v1.yiketianqi.com/free/day?appid=%s&appsecret=%s&unescape=1", appid, appsecret);
 
     }
     else
     {
-        sprintf(URL, "http://www.yiketianqi.com/free/day?appid=%s&appsecret=%s&unescape=1&city=%s",appid, appsecret, city);
+        sprintf(URL, "http://v1.yiketianqi.com/free/day?appid=%s&appsecret=%s&unescape=1&city=%s",appid, appsecret, city);
     }
     printf("%s", URL);
     esp_http_client_config_t config = {
-	//     .url = "http://www.yiketianqi.com/free/day?appid=97241921&appsecret=WIvntuL2&unescape=1",
+	//     .url = "http://v1.yiketianqi.com/free/day?appid=97241921&appsecret=WIvntuL2&unescape=1",
         .url = URL,
 	};
 
