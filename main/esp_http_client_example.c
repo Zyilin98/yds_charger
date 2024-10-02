@@ -63,6 +63,10 @@ esp_err_t _http_event_handler(esp_http_client_event_t *evt)
         case HTTP_EVENT_ON_HEADER:
             ESP_LOGD(TAG, "HTTP_EVENT_ON_HEADER, key=%s, value=%s", evt->header_key, evt->header_value);
             break;
+        case HTTP_EVENT_REDIRECT:
+            ESP_LOGD(TAG, "HTTP_EVENT_REDIRECT");
+            // 处理重定向或者留空
+            break;
         case HTTP_EVENT_ON_DATA:
             ESP_LOGD(TAG, "HTTP_EVENT_ON_DATA, len=%d", evt->data_len);
             /*
@@ -148,7 +152,7 @@ int cutString(const char * menu, char *target, char *buffer)
     if(position == -1)
         return -1;
     ESP_LOGI(TAG, "position %d", position);
-    int state = 0;
+    //int state = 0;
     int i = 0;
     int j = 0;
     for(i = position; i < strlen(buffer); i++)
@@ -201,17 +205,16 @@ static void http_rest_with_url(void)
      *
      * If URL as well as host and path parameters are specified, values of host and path will be considered.
      */
-    char output_buffer[MAX_HTTP_OUTPUT_BUFFER] = {0};   // Buffer to store response of http request
+        char output_buffer[MAX_HTTP_OUTPUT_BUFFER] = {0};   // Buffer to store response of http request
     int content_length = 0;
-    char URL[50];
-    if(city[0] == '\0')
+    char URL[256];  // 增加 URL 数组的大小
+    if (city[0] == '\0')
     {
-        sprintf(URL, "http://v1.yiketianqi.com/free/day?appid=%s&appsecret=%s&unescape=1", appid, appsecret);
-
+        snprintf(URL, sizeof(URL), "http://v1.yiketianqi.com/free/day?appid=%s&appsecret=%s&unescape=1", appid, appsecret);
     }
     else
     {
-        sprintf(URL, "http://v1.yiketianqi.com/free/day?appid=%s&appsecret=%s&unescape=1&city=%s",appid, appsecret, city);
+        snprintf(URL, sizeof(URL), "http://v1.yiketianqi.com/free/day?appid=%s&appsecret=%s&unescape=1&city=%s", appid, appsecret, city);
     }
     printf("%s", URL);
     esp_http_client_config_t config = {
@@ -232,7 +235,7 @@ static void http_rest_with_url(void)
         } else {
             int data_read = esp_http_client_read_response(client, output_buffer, MAX_HTTP_OUTPUT_BUFFER);
             if (data_read >= 0) {
-                ESP_LOGI(TAG, "HTTP GET Status = %d, content_length = %d",
+                ESP_LOGI(TAG, "HTTP GET Status = %d, content_length = %lld",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
                 ESP_LOGI(TAG, "data:%s", output_buffer);
@@ -263,7 +266,7 @@ static void http_rest_with_url(void)
 
     esp_http_client_close(client);
 }
-
+//WSD
 static void http_rest_with_hostname_path(void)
 {
     esp_http_client_config_t config = {
@@ -277,7 +280,7 @@ static void http_rest_with_hostname_path(void)
     // GET
     esp_err_t err = esp_http_client_perform(client);
     if (err == ESP_OK) {
-        ESP_LOGI(TAG, "HTTP GET Status = %d, content_length = %d",
+        ESP_LOGI(TAG, "HTTP GET Status = %d, content_length = %lld",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
     } else {
@@ -291,7 +294,7 @@ static void http_rest_with_hostname_path(void)
     esp_http_client_set_post_field(client, post_data, strlen(post_data));
     err = esp_http_client_perform(client);
     if (err == ESP_OK) {
-        ESP_LOGI(TAG, "HTTP POST Status = %d, content_length = %d",
+        ESP_LOGI(TAG, "HTTP POST Status = %d, content_length = %lld",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
     } else {
@@ -303,7 +306,7 @@ static void http_rest_with_hostname_path(void)
     esp_http_client_set_method(client, HTTP_METHOD_PUT);
     err = esp_http_client_perform(client);
     if (err == ESP_OK) {
-        ESP_LOGI(TAG, "HTTP PUT Status = %d, content_length = %d",
+        ESP_LOGI(TAG, "HTTP PUT Status = %d, content_length = %lld",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
     } else {
@@ -316,7 +319,7 @@ static void http_rest_with_hostname_path(void)
     esp_http_client_set_post_field(client, NULL, 0);
     err = esp_http_client_perform(client);
     if (err == ESP_OK) {
-        ESP_LOGI(TAG, "HTTP PATCH Status = %d, content_length = %d",
+        ESP_LOGI(TAG, "HTTP PATCH Status = %d, content_length = %lld",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
     } else {
@@ -328,7 +331,7 @@ static void http_rest_with_hostname_path(void)
     esp_http_client_set_method(client, HTTP_METHOD_DELETE);
     err = esp_http_client_perform(client);
     if (err == ESP_OK) {
-        ESP_LOGI(TAG, "HTTP DELETE Status = %d, content_length = %d",
+        ESP_LOGI(TAG, "HTTP DELETE Status = %d, content_length = %lld",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
     } else {
@@ -340,7 +343,7 @@ static void http_rest_with_hostname_path(void)
     esp_http_client_set_method(client, HTTP_METHOD_HEAD);
     err = esp_http_client_perform(client);
     if (err == ESP_OK) {
-        ESP_LOGI(TAG, "HTTP HEAD Status = %d, content_length = %d",
+        ESP_LOGI(TAG, "HTTP HEAD Status = %d, content_length = %lld",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
     } else {
@@ -370,7 +373,7 @@ static void http_auth_basic(void)
     esp_err_t err = esp_http_client_perform(client);
 
     if (err == ESP_OK) {
-        ESP_LOGI(TAG, "HTTP Basic Auth Status = %d, content_length = %d",
+        ESP_LOGI(TAG, "HTTP Basic Auth Status = %d, content_length = %lld",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
     } else {
@@ -389,7 +392,7 @@ static void http_auth_basic_redirect(void)
     esp_err_t err = esp_http_client_perform(client);
 
     if (err == ESP_OK) {
-        ESP_LOGI(TAG, "HTTP Basic Auth redirect Status = %d, content_length = %d",
+        ESP_LOGI(TAG, "HTTP Basic Auth redirect Status = %d, content_length = %lld",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
     } else {
@@ -410,7 +413,7 @@ static void http_auth_digest(void)
     esp_err_t err = esp_http_client_perform(client);
 
     if (err == ESP_OK) {
-        ESP_LOGI(TAG, "HTTP Digest Auth Status = %d, content_length = %d",
+        ESP_LOGI(TAG, "HTTP Digest Auth Status = %d, content_length = %lld",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
     } else {
@@ -431,7 +434,7 @@ static void https_with_url(void)
     esp_err_t err = esp_http_client_perform(client);
 
     if (err == ESP_OK) {
-        ESP_LOGI(TAG, "HTTPS Status = %d, content_length = %d",
+        ESP_LOGI(TAG, "HTTPS Status = %d, content_length = %lld",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
     } else {
@@ -452,7 +455,7 @@ static void https_with_hostname_path(void)
     esp_err_t err = esp_http_client_perform(client);
 
     if (err == ESP_OK) {
-        ESP_LOGI(TAG, "HTTPS Status = %d, content_length = %d",
+        ESP_LOGI(TAG, "HTTPS Status = %d, content_length = %lld",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
     } else {
@@ -471,7 +474,7 @@ static void http_relative_redirect(void)
     esp_err_t err = esp_http_client_perform(client);
 
     if (err == ESP_OK) {
-        ESP_LOGI(TAG, "HTTP Relative path redirect Status = %d, content_length = %d",
+        ESP_LOGI(TAG, "HTTP Relative path redirect Status = %d, content_length = %lld",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
     } else {
@@ -490,7 +493,7 @@ static void http_absolute_redirect(void)
     esp_err_t err = esp_http_client_perform(client);
 
     if (err == ESP_OK) {
-        ESP_LOGI(TAG, "HTTP Absolute path redirect Status = %d, content_length = %d",
+        ESP_LOGI(TAG, "HTTP Absolute path redirect Status = %d, content_length = %lld",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
     } else {
@@ -509,7 +512,7 @@ static void http_redirect_to_https(void)
     esp_err_t err = esp_http_client_perform(client);
 
     if (err == ESP_OK) {
-        ESP_LOGI(TAG, "HTTP redirect to HTTPS Status = %d, content_length = %d",
+        ESP_LOGI(TAG, "HTTP redirect to HTTPS Status = %d, content_length = %lld",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
     } else {
@@ -529,7 +532,7 @@ static void http_download_chunk(void)
     esp_err_t err = esp_http_client_perform(client);
 
     if (err == ESP_OK) {
-        ESP_LOGI(TAG, "HTTP chunk encoding Status = %d, content_length = %d",
+        ESP_LOGI(TAG, "HTTP chunk encoding Status = %d, content_length = %lld",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
     } else {
@@ -565,7 +568,7 @@ static void http_perform_as_stream_reader(void)
         buffer[read_len] = 0;
         ESP_LOGD(TAG, "read_len = %d", read_len);
     }
-    ESP_LOGI(TAG, "HTTP Stream reader Status = %d, content_length = %d",
+    ESP_LOGI(TAG, "HTTP Stream reader Status = %d, content_length = %lld",
                     esp_http_client_get_status_code(client),
                     esp_http_client_get_content_length(client));
     esp_http_client_close(client);
@@ -596,7 +599,7 @@ static void https_async(void)
         }
     }
     if (err == ESP_OK) {
-        ESP_LOGI(TAG, "HTTPS Status = %d, content_length = %d",
+        ESP_LOGI(TAG, "HTTPS Status = %d, content_length = %lld",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
     } else {
@@ -615,7 +618,7 @@ static void https_with_invalid_url(void)
     esp_err_t err = esp_http_client_perform(client);
 
     if (err == ESP_OK) {
-        ESP_LOGI(TAG, "HTTPS Status = %d, content_length = %d",
+        ESP_LOGI(TAG, "HTTPS Status = %d, content_length = %lld",
                  esp_http_client_get_status_code(client),
                  esp_http_client_get_content_length(client));
     } else {
@@ -651,7 +654,7 @@ static void http_native_request(void)
         } else {
             int data_read = esp_http_client_read_response(client, output_buffer, MAX_HTTP_OUTPUT_BUFFER);
             if (data_read >= 0) {
-                ESP_LOGI(TAG, "HTTP GET Status = %d, content_length = %d",
+                ESP_LOGI(TAG, "HTTP GET Status = %d, content_length = %lld",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
                 ESP_LOG_BUFFER_HEX(TAG, output_buffer, data_read);
@@ -681,7 +684,7 @@ static void http_native_request(void)
         } else {
             int data_read = esp_http_client_read_response(client, output_buffer, MAX_HTTP_OUTPUT_BUFFER);
             if (data_read >= 0) {
-                ESP_LOGI(TAG, "HTTP POST Status = %d, content_length = %d",
+                ESP_LOGI(TAG, "HTTP POST Status = %d, content_length = %lld",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
                 ESP_LOG_BUFFER_HEX(TAG, output_buffer, strlen(output_buffer));
@@ -706,7 +709,7 @@ static void http_partial_download(void)
     esp_http_client_set_header(client, "Range", "bytes=10-");
     esp_err_t err = esp_http_client_perform(client);
     if (err == ESP_OK) {
-        ESP_LOGI(TAG, "HTTP Status = %d, content_length = %d",
+        ESP_LOGI(TAG, "HTTP Status = %d, content_length = %lld",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
     } else {
@@ -717,7 +720,7 @@ static void http_partial_download(void)
     esp_http_client_set_header(client, "Range", "bytes=-10");
     err = esp_http_client_perform(client);
     if (err == ESP_OK) {
-        ESP_LOGI(TAG, "HTTP Status = %d, content_length = %d",
+        ESP_LOGI(TAG, "HTTP Status = %d, content_length = %lld",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
     } else {
@@ -728,7 +731,7 @@ static void http_partial_download(void)
     esp_http_client_set_header(client, "Range", "bytes=11-20");
     err = esp_http_client_perform(client);
     if (err == ESP_OK) {
-        ESP_LOGI(TAG, "HTTP Status = %d, content_length = %d",
+        ESP_LOGI(TAG, "HTTP Status = %d, content_length = %lld",
                 esp_http_client_get_status_code(client),
                 esp_http_client_get_content_length(client));
     } else {

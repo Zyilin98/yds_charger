@@ -3,5 +3,5 @@
 nvs,      data, nvs,     ,        0x4000,
 otadata,  data, ota,     ,        0x2000,
 phy_init, data, phy,     ,        0x1000,
-ota_0,    app,  ota_0,   ,        0X16E360,
-ota_1,    app,  ota_1,   ,        0X16E360,
+ota_0,    app,  ota_0,   ,        0X16F000,
+ota_1,    app,  ota_1,   ,        0X16F000,
