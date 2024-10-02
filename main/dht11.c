@@ -9,7 +9,6 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "driver/ledc.h"
-#include <stdio.h>
 #include "driver/uart.h"
 #include "driver/gpio.h"
 #include "string.h"
