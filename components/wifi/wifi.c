@@ -13,7 +13,6 @@
    software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
    CONDITIONS OF ANY KIND, either express or implied.
 */
-#include "wifi.h"
 #include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -26,6 +25,9 @@
 #include "esp_smartconfig.h"
 #include "lwip/err.h"
 #include "lwip/sys.h"
+#include "esp_netif.h"
+#include "esp_err.h"
+#include "protocol_examples_common.h"
 
 static EventGroupHandle_t s_wifi_event_group;
 
@@ -37,7 +39,7 @@ static const char *TAG = "wifi station";
 
 static int s_retry_num = 0;
 
-static void smartconfig_example_task(void *parm);
+//static void smartconfig_example_task(void *parm);
 
 static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
@@ -74,7 +76,7 @@ static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_
         // 连接到了WIFI,获取IP后,给事件组设置对应标志位
         xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
     }
-    // Smart-config的处理函数
+/*   // Smart-config的处理函数
     else if (event_base == SC_EVENT && event_id == SC_EVENT_SCAN_DONE)
     {
         ESP_LOGI(TAG, "Scan done");
@@ -131,6 +133,7 @@ static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_
         // Smart-config全部完成
         xEventGroupSetBits(s_wifi_event_group, ESPTOUCH_DONE_BIT);
     }
+*/
 }
 
 /* wifi初始化函数 mode[0:1] 0:初次初始化 1:手动配网 */
@@ -226,7 +229,7 @@ uint8_t wifi_init_sta(uint8_t mode)
         esp_event_handler_register(SC_EVENT, ESP_EVENT_ANY_ID, &event_handler, NULL);
         esp_wifi_set_mode(WIFI_MODE_STA);
         esp_wifi_start();
-        xTaskCreate(smartconfig_example_task, "smartconfig_example_task", 4096, NULL, 3, NULL); //开始配网
+        xTaskCreate(soft_ap_example_task, "soft_ap_example_task", 4096, NULL, 3, NULL); //开始配网
         bits = xEventGroupWaitBits(s_wifi_event_group,
                                    ESPTOUCH_DONE_BIT,
                                    pdFALSE,
@@ -243,7 +246,7 @@ uint8_t wifi_init_sta(uint8_t mode)
    return err;
 }
 
-static void smartconfig_example_task(void *parm)
+/*static void smartconfig_example_task(void *parm)
 {
     EventBits_t uxBits;
     // 设定配网方式为ESP_TOUCH
@@ -271,4 +274,5 @@ static void smartconfig_example_task(void *parm)
         }
     }
 }
+*/
 

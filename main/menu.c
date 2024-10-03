@@ -922,7 +922,7 @@ static void oledWeatherSurface(void)
   char str[200] = {'\0'};
   if(strlen(mWeather.city) == 0)
   {
-    u8g2_DrawUTF8(&u8g2, 0, 42, "网络异常！");
+    u8g2_DrawUTF8(&u8g2, 0, 42, "网络或API异常！");
     u8g2_SendBuffer(&u8g2);
     return;
   }

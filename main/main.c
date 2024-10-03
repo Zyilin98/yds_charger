@@ -330,7 +330,7 @@ void ALL_Init(void){
     if (event == U8X8_MSG_GPIO_MENU_SELECT)
     {
         wifiMode = 1;
-        ESP_LOGI(TAG, "an jian jin lai l");
+        ESP_LOGI(TAG, "touch setting wifi = 1");
         break;
     }
   }
