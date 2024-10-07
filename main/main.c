@@ -47,8 +47,6 @@ extern char appid[20];
 extern char appsecret[20];
 int16_t light = 10;
 int16_t boardMode = 0;
-extern unsigned char wifi_ssid[32];
-extern unsigned char wifi_password[64];
 
 void nvsRead(void)
 {
