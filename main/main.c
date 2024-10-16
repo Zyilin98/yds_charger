@@ -351,13 +351,12 @@ void ALL_Init(void){
       oledInitMessageTask(4 + wifiMode,"ER");
       vTaskDelay(pdMS_TO_TICKS(2000));
     }
-  }
-  else{
+    }
+    else{
     //wifi_init_sta(0);
     oledInitMessageTask(4 + wifiMode,"NO");
     ESP_LOGI(TAG,"No Config Wifi");
-    vTaskDelay(pdMS_TO_TICKS(200));
-    
+    vTaskDelay(pdMS_TO_TICKS(2000));  
     nvs_close(wificonfig_handle);
   }
   //OTA_Init(); // Init Wifi
@@ -377,7 +376,7 @@ void ALL_Init(void){
   xTaskCreate(&http_test_task, "http_test_task", 8192, NULL, 1, NULL);
   xTaskCreate(udp_server_task, "udp_server", 4096, (void*)AF_INET, 4, NULL);
 
-  user_mqtt_app_start();
+  //user_mqtt_app_start();
   if(boardMode == 1)
   {
      xTaskCreate(dht11Task, "dht11Task", 4096, NULL, 2, NULL);

@@ -157,12 +157,12 @@ void lis3dhTask(void *pvParameters)
   }
 }
 
-void ntpClockTask(void *pvParameters){
+/*void ntpClockTask(void *pvParameters){
   for (;;){
     vTaskDelay(pdMS_TO_TICKS(5000));
   }
 }
-
+*/
 void taskMonitor(void *pvParameters){
   UBaseType_t uxHighWaterMark;
   for (;;){
