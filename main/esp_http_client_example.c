@@ -263,7 +263,6 @@ static void http_rest_with_url(void)
     esp_http_client_close(client);
 }
 //WSD
-/*
 static void http_rest_with_hostname_path(void)
 {
     esp_http_client_config_t config = {
@@ -359,7 +358,7 @@ static void http_auth_basic(void)
      * in case unauthorized status code is received.
      *
      * To disable authorization retries, set max_authorization_retries to -1.
-     *
+     */
     esp_http_client_config_t config = {
         .url = "http://user:passwd@httpbin.org/basic-auth/user/passwd",
         .event_handler = _http_event_handler,
@@ -629,7 +628,7 @@ static void https_with_invalid_url(void)
  *  make a http request and read response. Event handler is not used in this case.
  *  Note: This approach should only be used in case use of low level APIs is required.
  *  The easiest way is to use esp_http_perform()
- *
+ */
 static void http_native_request(void)
 {
     char output_buffer[MAX_HTTP_OUTPUT_BUFFER] = {0};   // Buffer to store response of http request
@@ -737,7 +736,7 @@ static void http_partial_download(void)
 
     esp_http_client_cleanup(client);
 }
-*/
+
 void http_test_task(void *pvParameters)
 {
     http_rest_with_url();
