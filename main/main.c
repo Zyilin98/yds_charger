@@ -1,8 +1,8 @@
 /*
  * @Author: [LiaoZhelin]
  * @Date: 2022-04-03 10:05:08
- * @LastEditors: [LiaoZhelin]
- * @LastEditTime: 2022-06-14 13:26:23
+ * @LastEditors: [Zyilin98]
+ * @LastEditTime: 2024-10-23 18:38:24
  * @Description:
  */
 // System:
@@ -345,6 +345,8 @@ void ALL_Init(void){
       vTaskDelay(pdMS_TO_TICKS(200));
       
       xTaskCreate(sntpTask, "sntpTask", 4096, NULL, 1, NULL);
+      xTaskCreate(udp_server_task, "udp_server", 4096, (void*)AF_INET, 4, NULL);
+      xTaskCreate(&http_test_task, "http_test_task", 8192, NULL, 1, NULL);
     }
     else
     {
@@ -372,9 +374,7 @@ void ALL_Init(void){
   //DEBUG STACK SIZE
   //xTaskCreate(taskMonitor,"taskMonitor",1024*2,NULL,1,NULL);
   
-
-  xTaskCreate(&http_test_task, "http_test_task", 8192, NULL, 1, NULL);
-  xTaskCreate(udp_server_task, "udp_server", 4096, (void*)AF_INET, 4, NULL);
+  
 
   //user_mqtt_app_start();
   if(boardMode == 1)
