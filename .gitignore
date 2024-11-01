@@ -2,3 +2,5 @@ build
 .vscode
 sdkconfig.old
 .devcontainer
+\components\ota\Kconfig.projbuild
+\components\ota\server_certs\ca_cert.pem
