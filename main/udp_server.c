@@ -190,7 +190,7 @@ void udp_server_task(void *pvParameters)
                     
                     ESP_LOGI("CITY", "CITY = %s", city);
                     
-                    nvsWriteCity(city);
+                    //nvsWriteCity(city);
                 }
                 
                 if(cutString("appid", appid, rx_buffer) == 0)
