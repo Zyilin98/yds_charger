@@ -74,21 +74,21 @@ void sw35xxTask(void *pvParameters)
     SW35XXUpdate();
     double c1P = ((double)sw35xx_c1.OutVol * 6) * ((double)sw35xx_c1.OutCur * 25 / 10) / 1000000;
     double c2P = ((double)sw35xx_c2.OutVol * 6) * ((double)sw35xx_c2.OutCur * 25 / 10) / 1000000;
-    if(c1P > 0.2)
+    if(c1P > 0.3)
     {
       rgbOn[0] = 1;
     }
-    else if(c1P < 0.1)
+    else if(c1P < 0.2)
     {
       rgbOn[0] = 0;
     }
 
 
-    if(c2P > 0.2)
+    if(c2P > 0.3)
     {
       rgbOn[1] = 1;
     }
-    else if(c2P < 0.1)
+    else if(c2P < 0.2)
     {
       rgbOn[1] = 0;
     }
