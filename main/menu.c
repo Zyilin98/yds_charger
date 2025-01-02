@@ -1398,7 +1398,7 @@ void findChange(double c1POld, double c2POld, uint8_t *Mode)
     double c2P = ((double)sw35xx_c2.OutVol * 6) * ((double)sw35xx_c2.OutCur * 25 / 10) / 1000000;
 
 
-    if((c1P > 0.2 && c1POld < 0.1) || (c1P < 0.1 && c1POld > 0.2) || (c2P > 0.2 && c2POld < 0.1) || (c2P < 0.1 && c2POld > 0.2))
+    if((c1P > 0.3 && c1POld < 0.2) || (c1P < 0.2 && c1POld > 0.3) || (c2P > 0.3 && c2POld < 0.2) || (c2P < 0.2 && c2POld > 0.3))
     {
       if(OledProtectBegin == 1)
       {
@@ -1483,7 +1483,7 @@ void oledTask(void *pvParameters)
     {
     
       time(&nowTime);
-      if(nowTime - beginTime >= 60)
+      if(nowTime - beginTime >= 45)
       {
         OledProtectBegin = 1;
         
@@ -1549,7 +1549,7 @@ void oledInitMessageTask(uint8_t num,char *state){
       u8g2_DrawUTF8(&u8g2, 0, 63, buf);
       break;
       case 5:
-      sprintf(buf,"请使用esptouch...%s",state);
+      sprintf(buf,"使用esptouch配网...%s",state);
       u8g2_DrawUTF8(&u8g2, 0, 63, buf);
       break;
   }
