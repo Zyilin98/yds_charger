@@ -1347,7 +1347,7 @@ static void oledSettingSurface(void)
       }
       break;
     case 7:
-      current_selection = u8g2_UserInterfaceSelectionList(&u8g2, "关于", 1, "版权所有\n伦敦烟云smog\nModified by Ktx\nFix by Zyilin98\n<-返回");
+      current_selection = u8g2_UserInterfaceSelectionList(&u8g2, "关于", 1, "版权所有\n伦敦烟云smog\nModified by Ktx\nFix by Zyilin98\n固件版本: V1.6.7\n<-返回"); // 使用 硬编码 显示固件版本，我确实想不起来还有什么办法可以显示版本
       break;
     case 8:
       esp_restart();
@@ -1435,7 +1435,7 @@ void oledChargePower(uint8_t event)
 }
 void oledTask(void *pvParameters)
 {
-  uint8_t Mode = 0; // 0-3分别对应主界面1，主界面2，主界面3，设置姐买你
+  uint8_t Mode = 0; // 0-3分别对应主界面1，主界面2，主界面3
   time_t nowTime = 0;
   time(&beginTime);
   double c1POld = (sw35xx_c1.OutVol * 6) * (sw35xx_c1.OutCur * 25 / 10) / 1000000;
