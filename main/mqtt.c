@@ -30,7 +30,7 @@
 #include "sw3526.h"
 #include "adc_read.h"
 #include "mqtt.h"
-#include "esp_http_client_example.h"
+#include "http_client.h"
 
  
 static const char *TAG = "MQTT_EXAMPLE";

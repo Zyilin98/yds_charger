@@ -2,7 +2,7 @@
  * @Author: [LiaoZhelin]
  * @Date: 2022-04-03 10:05:08
  * @LastEditors: [Zyilin98]
- * @LastEditTime: 2024-10-23 18:38:24
+ * @LastEditTime: 2025-01-03 18:07:43
  * @Description:
  */
 // System:
@@ -36,7 +36,7 @@
 
 
 #include "task.h"
-#include "esp_http_client_example.h"
+#include "http_client.h"
 #include "mqtt.h"
 
 static const char *TAG = "main";

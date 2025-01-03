@@ -1,8 +1,8 @@
 /*
  * @Author: [LiaoZhelin]
  * @Date: 2022-04-29 20:32:29
- * @LastEditors: [LiaoZhelin]
- * @LastEditTime: 2022-06-14 14:06:11
+ * @LastEditors: [Zyilin98]
+ * @LastEditTime: 2025-01-03 18:07:43
  * @Description:
  */
 #include <time.h>
@@ -34,7 +34,7 @@
 #include "task.h"
 #include "ota.h"
 #include "wifi.h"
-#include "esp_http_client_example.h"
+#include "http_client.h"
 #define EXIT_MENU_CHECK \
   if (exit_flag)        \
   {                     \

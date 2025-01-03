@@ -24,7 +24,7 @@
 #include <lwip/netdb.h>
 #include "sw3526.h"
 #include <adc_read.h>
-#include "esp_http_client_example.h"
+#include "http_client.h"
 #include "menu.h"
 #include "mqtt.h"
 
