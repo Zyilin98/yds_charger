@@ -8,8 +8,8 @@
 /*
  * @Author: [LiaoZhelin]
  * @Date: 2022-02-10 12:07:09
- * @LastEditors: [LiaoZhelin]
- * @LastEditTime: 2022-04-07 22:25:36
+* @LastEditors: [Zyilin98]
+ * @LastEditTime: 2025-01-06 10:07:43
  * @Description: 
  */
 #ifndef _ADC_READ_H_
@@ -29,10 +29,10 @@ extern "C" {
 static const adc_unit_t unit = ADC_UNIT_1;
 static const adc_bits_width_t width = ADC_WIDTH_BIT_12;
 
-static const adc_atten_t atten1 = ADC_ATTEN_DB_11;
+static const adc_atten_t atten1 = ADC_ATTEN_DB_12;
 static const adc_channel_t channel1 = ADC_CHANNEL_0; 
 
-static const adc_atten_t atten2 = ADC_ATTEN_DB_11;
+static const adc_atten_t atten2 = ADC_ATTEN_DB_12;
 static const adc_channel_t channel2 = ADC_CHANNEL_1; 
 
 #define DEFAULT_VREF    1100

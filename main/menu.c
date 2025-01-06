@@ -23,7 +23,6 @@
 #include "esp_wifi.h"
 #include "wifi.h"
 #include "esp_netif.h"
-#include <tcpip_adapter.h>
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
