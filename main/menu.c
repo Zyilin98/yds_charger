@@ -2,7 +2,7 @@
  * @Author: [LiaoZhelin]
  * @Date: 2022-04-29 20:32:29
  * @LastEditors: [Zyilin98]
- * @LastEditTime: 2025-01-03 18:07:43
+ * @LastEditTime: 2025-01-06 10:26:43
  * @Description:
  */
 #include <time.h>
@@ -395,26 +395,35 @@ void nvsWriteOledOffTimeEnd()
 static void oledWifiShowTask(void)
 {
   wifi_ap_record_t ap;
-  tcpip_adapter_ip_info_t ipInfo;
+  esp_netif_ip_info_t ipInfo;
   for (;;)
   {
     char buf[20] = {0};
     esp_wifi_sta_get_ap_info(&ap);
-      esp_err_t err = esp_netif_get_ip_info(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"), &ipInfo); 
-   
+
+    esp_err_t err = esp_netif_get_ip_info(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"), &ipInfo);
+
+    if (err != ESP_OK) {
+      ESP_LOGE("OLED_WIFI", "Failed to get IP info: %d", err);
+      continue;
+    }
+
     char ip_Str[16] = {0};
     esp_ip4addr_ntoa(&ipInfo.ip, ip_Str, sizeof(ip_Str));
+
     uint8_t event = u8x8_GetMenuEvent(u8g2_GetU8x8(&u8g2));
     u8g2_ClearBuffer(&u8g2);
-    sprintf(buf, "SSID名称: %s", ap.ssid);
+
+    sprintf(buf, "SSID: %s", ap.ssid);
     u8g2_DrawUTF8(&u8g2, 0, 15, buf);
     sprintf(buf, "IP: %s", ip_Str);
     u8g2_DrawUTF8(&u8g2, 0, 31, buf);
     sprintf(buf, "RSSI信号强度: %d", ap.rssi);
     u8g2_DrawUTF8(&u8g2, 0, 47, buf);
-    sprintf(buf, "Primary信道: %d", ap.primary);
+    sprintf(buf, "当前主信道: %d", ap.primary);
     u8g2_DrawUTF8(&u8g2, 0, 63, buf);
     u8g2_SendBuffer(&u8g2);
+
     if (event == U8X8_MSG_GPIO_MENU_SELECT)
     {
       break;
