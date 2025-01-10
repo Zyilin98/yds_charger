@@ -7,7 +7,8 @@ cmake_minimum_required(VERSION 3.5)
 #版本号
 set(PROJECT_VER "1.6.7")
 
-set(EXTRA_COMPONENT_DIRS $ENV{IDF_PATH}/examples/common_components/protocol_examples_common)
+set(EXTRA_COMPONENT_DIRS "$ENV{IDF_PATH}/examples/common_components/protocol_examples_common")
+list(APPEND EXTRA_COMPONENT_DIRS "$ENV{IDF_PATH}/components/driver/include")
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(yds_charger)

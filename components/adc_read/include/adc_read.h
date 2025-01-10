@@ -23,8 +23,11 @@ extern "C" {
 #include "freertos/task.h"
 
 #include "driver/gpio.h"
-#include "driver/adc.h"
-#include "esp_adc_cal.h"
+#include "esp_adc/adc_continuous.h"
+#include "hal/adc_types.h"
+//#include "esp_adc_cal.h"
+#include "esp_adc/adc_cali.h"
+#include "esp_adc/adc_cali_scheme.h"
 
 static const adc_unit_t unit = ADC_UNIT_1;
 static const adc_bits_width_t width = ADC_WIDTH_BIT_12;
