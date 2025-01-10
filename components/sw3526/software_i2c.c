@@ -73,13 +73,13 @@ void setsw_i2c(swi2c_t i2cselect){
 esp_err_t sw_i2c_init(uint8_t sda, uint8_t scl,swi2c_t i2cselect)
 {
     ESP_LOGD(TAG, "Initializing software i2c with data pin %d.", sda);
-    gpio_pad_select_gpio(sda);
+    esp_rom_gpio_pad_select_gpio(sda);
     gpio_set_direction(sda, GPIO_MODE_INPUT_OUTPUT_OD);
     gpio_set_pull_mode(sda, GPIO_PULLUP_ONLY);
     gpio_set_level(sda, 1);
 
     ESP_LOGD(TAG, "Initializing software i2c with clock pin %d.", scl);
-    gpio_pad_select_gpio(scl);
+    esp_rom_gpio_pad_select_gpio(scl);
     gpio_set_direction(scl, GPIO_MODE_INPUT_OUTPUT_OD);
     gpio_set_pull_mode(scl, GPIO_PULLUP_ONLY);
     gpio_set_level(scl, 1);
@@ -107,12 +107,12 @@ esp_err_t sw_i2c_master_start()
      /* If already started, do a restart condition. */
     if (g_i2c_started) {
         gpio_set_level(g_i2c_sda, HIGH);
-        ets_delay_us(10);
+        esp_rom_delay_us(10);
         gpio_set_level(g_i2c_scl, HIGH);
         while (gpio_get_level(g_i2c_scl) == LOW && stretch--) {
-            ets_delay_us(1);
+            esp_rom_delay_us(1);
         };
-        ets_delay_us(10);
+        esp_rom_delay_us(10);
     }
 
     if (LOW == gpio_get_level(g_i2c_sda)) {
@@ -121,7 +121,7 @@ esp_err_t sw_i2c_master_start()
 
     /* Start bit is indicated by a high-to-low transition of SDA with SCL high. */
     gpio_set_level(g_i2c_sda, LOW);
-    ets_delay_us(10);
+    esp_rom_delay_us(10);
     gpio_set_level(g_i2c_scl, LOW);
 
     g_i2c_started = true;
@@ -136,16 +136,16 @@ esp_err_t sw_i2c_master_stop()
 
     /* The stop bit is indicated by a low-to-high transition of SDA with SCL high. */
     gpio_set_level(g_i2c_sda, LOW);
-    ets_delay_us(10);
+    esp_rom_delay_us(10);
     gpio_set_level(g_i2c_scl, HIGH);
 
     while (gpio_get_level(g_i2c_scl) == LOW && stretch--) {
-        ets_delay_us(1);
+        esp_rom_delay_us(1);
     };
 
-    ets_delay_us(10);
+    esp_rom_delay_us(10);
     gpio_set_level(g_i2c_sda, HIGH);
-    ets_delay_us(10);
+    esp_rom_delay_us(10);
 
     if (gpio_get_level(g_i2c_sda) == LOW) {
         ESP_LOGD(TAG, "Arbitration lost in sw_i2c_master_stop()");
@@ -161,14 +161,14 @@ static void sw_i2c_write_bit(bool bit)
     uint32_t stretch = CLOCK_STRETCH_TIMEOUT;
 
     gpio_set_level(g_i2c_sda, bit);
-    ets_delay_us(10); /* SDA change propagation delay */
+    esp_rom_delay_us(10); /* SDA change propagation delay */
     gpio_set_level(g_i2c_scl, HIGH); /* New valid SDA value is available. */
 
     while (gpio_get_level(g_i2c_scl) == LOW && stretch--) {
-        ets_delay_us(1);
+        esp_rom_delay_us(1);
     };
 
-    ets_delay_us(10); /* Wait for SDA value to be read by slave. */
+    esp_rom_delay_us(10); /* Wait for SDA value to be read by slave. */
 
     if (bit && (LOW == gpio_get_level(g_i2c_sda))) {
         ESP_LOGD(TAG, "Arbitration lost in sw_i2c_write_bit()");
@@ -183,16 +183,16 @@ static bool sw_i2c_read_bit()
     bool bit;
 
     gpio_set_level(g_i2c_sda, HIGH); /* Let the slave drive data. */
-    ets_delay_us(10); /* Wait for slave to write. */
+    esp_rom_delay_us(10); /* Wait for slave to write. */
     gpio_set_level(g_i2c_scl, HIGH); /* New valid SDA value is available. */
 
     while (gpio_get_level(g_i2c_scl) == LOW && stretch--) {
-        ets_delay_us(1);
+        esp_rom_delay_us(1);
     };
     if(!stretch){
         ESP_LOGI(TAG,"read time out!\n");
     }
-    ets_delay_us(10); /* Wait for slave to write. */
+    esp_rom_delay_us(10); /* Wait for slave to write. */
     bit = gpio_get_level(g_i2c_sda); /* SCL is high, read a bit. */
     gpio_set_level(g_i2c_scl, LOW); /* Prepare for next bit. */
 
