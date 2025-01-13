@@ -42,8 +42,8 @@ extern char oldVersion[20];
 
 uint16_t checkVersion;
 uint16_t isEqu = 0;
-char newVersion[10] = {'\0'};
-char runVersion[10] = {'\0'};
+char newVersion[32] = {'\0'};
+char runVersion[32] = {'\0'};
 uint16_t getIsEqu()
 {
     return isEqu;
@@ -75,8 +75,8 @@ static esp_err_t validate_image_header(esp_app_desc_t *new_app_info)
     if (esp_ota_get_partition_description(running, &running_app_info) == ESP_OK) { //返回正在运行引用程序分区的版本号
         ESP_LOGI(TAG, "Running firmware version: %s", running_app_info.version);  //打印版本号
     }
-    sprintf(newVersion, "%s", new_app_info->version);
-    sprintf(runVersion, "%s", running_app_info.version);
+    snprintf(newVersion, sizeof(newVersion), "%s", new_app_info->version);
+    snprintf(runVersion, sizeof(runVersion), "%s", running_app_info.version);
 #ifndef CONFIG_EXAMPLE_SKIP_VERSION_CHECK
     if (memcmp(new_app_info->version, running_app_info.version, sizeof(new_app_info->version)) == 0) { //比较版本号，如果一样则退出
         ESP_LOGW(TAG, "Current running version is the same as a new. We will not continue the update.");
@@ -116,10 +116,10 @@ void advanced_ota_example_task(void *pvParameter)
 {
 
     ESP_LOGI(TAG, "Starting Advanced OTA example");
-    char urlA[60];
+    char urlA[72];
     if(strlen(oldVersion) > 4)
     {
-        sprintf(urlA, "%s.v%s", CONFIG_EXAMPLE_FIRMWARE_UPGRADE_URL, oldVersion);
+        snprintf(urlA, sizeof(urlA), "%s.v%s", CONFIG_EXAMPLE_FIRMWARE_UPGRADE_URL, oldVersion);
     }
     else
     {

@@ -398,7 +398,7 @@ static void oledWifiShowTask(void)
   esp_netif_ip_info_t ipInfo;
   for (;;)
   {
-    char buf[20] = {0};
+    char buf[64] = {0};
     esp_wifi_sta_get_ap_info(&ap);
 
     esp_err_t err = esp_netif_get_ip_info(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"), &ipInfo);
@@ -414,7 +414,7 @@ static void oledWifiShowTask(void)
     uint8_t event = u8x8_GetMenuEvent(u8g2_GetU8x8(&u8g2));
     u8g2_ClearBuffer(&u8g2);
 
-    sprintf(buf, "SSID: %s", ap.ssid);
+    snprintf(buf, sizeof(buf),  "SSID: %s", ap.ssid);
     u8g2_DrawUTF8(&u8g2, 0, 15, buf);
     sprintf(buf, "IP: %s", ip_Str);
     u8g2_DrawUTF8(&u8g2, 0, 31, buf);
@@ -455,7 +455,7 @@ static void oledVIShowTask(void)
   for (;;)
   {
     
-    char buf[20] = {0};
+    char buf[32] = {0};
     uint8_t event = u8x8_GetMenuEvent(u8g2_GetU8x8(&u8g2));
     if(OledProtectBegin == 0)
     {
@@ -492,7 +492,7 @@ static void oledVIShowTask(void)
 static void oledProtocolShowTask_1(void)
 {
   uint16_t c1CurRevise = sw35xx_c1.OutCur * C1REVISE;
-  char buf[20] = {0};
+  char buf[32] = {0};
   u8g2_ClearBuffer(&u8g2);
   u8g2_DrawUTF8(&u8g2, 25, 16, "C1口");
   switch (sw35xx_c1.protocol)
@@ -560,7 +560,7 @@ static void oledProtocolShowTask_1(void)
 static void oledProtocolShowTask_2(void)
 {
   uint16_t c2CurRevise = sw35xx_c2.OutCur * C2REVISE;
-  char buf[20] = {0};
+  char buf[32] = {0};
   u8g2_ClearBuffer(&u8g2);
   u8g2_DrawUTF8(&u8g2, 25, 16, "C2口");
   switch (sw35xx_c2.protocol)
@@ -739,7 +739,7 @@ void fallBack(char * runVersion, char * oldVersion)
   getLastVersion(old2, old3);
   getLastVersion(old3, old4);
   getLastVersion(old4, old5);
-  char dis[100];
+  char dis[128];
   sprintf(dis, "%s\n%s\n%s\n%s\n%s\n<-返回",old1, old2, old3, old4, old5);
   uint8_t current_selection = u8g2_UserInterfaceSelectionList(&u8g2, "版本选择", 1, dis);
  switch (current_selection)
@@ -797,7 +797,7 @@ static void oledManualOTATask(void)
     u8g2_ClearBuffer(&u8g2);
     u8g2_DrawUTF8(&u8g2, 2, 16, "正在检查服务器");
     u8g2_DrawUTF8(&u8g2, 2, 30, "是否连通");
-    sprintf(countDown, "倒计时%d秒", 5 - (nowTime - oldTime));
+    sprintf(countDown, "倒计时%lld秒", 5 - (nowTime - oldTime));
     u8g2_DrawUTF8(&u8g2, 10, 46, countDown);  
     if(nowTime - oldTime >= 5)
     {
@@ -877,7 +877,7 @@ static void oledChargeSurface(void)
 {
   uint16_t c1CurRevise = sw35xx_c1.OutCur * C1REVISE;
   uint16_t c2CurRevise = sw35xx_c2.OutCur * C2REVISE;
-  char buf[20] = {0};
+  char buf[32] = {0};
   u8g2_ClearBuffer(&u8g2);
   u8g2_DrawLine(&u8g2, 85, 6, 85, 28);
   u8g2_DrawLine(&u8g2, 84, 6, 84, 28);
@@ -967,7 +967,7 @@ void oledStopDisplay()
   static time_t oldTimef = 0;
   static uint32_t num = 0;
   struct tm timeinfo;
-  char buf[20];
+  char buf[32];
   char mmm = 0;
   time(&nowTimef);
   
@@ -1104,7 +1104,7 @@ void displayRgbSet(char* header, int16_t* RGB)
       *RGB = *RGB <= 0 ? 0 : *RGB - 1;
     }
 
-    char buf[20];
+    char buf[32];
     sprintf(buf, "当前%s亮度 %d",header, *RGB);
     u8g2_DrawUTF8(&u8g2, 0, 62, buf);
     u8g2_SendBuffer(&u8g2);
@@ -1331,8 +1331,8 @@ static void oledSettingSurface(void)
       case 6:
       for (;;)
       {
-        char buf[50];
-        sprintf(buf, "设置熄屏起始时间 %2d\n设置熄屏结束时间 %2d\n<-返回", oledOffTimeBegin, oledOffTimeEnd);
+        char buf[70];
+        snprintf(buf, sizeof(buf),  "设置熄屏起始时间 %2d\n设置熄屏结束时间 %2d\n<-返回", oledOffTimeBegin, oledOffTimeEnd);
         current_selection = u8g2_UserInterfaceSelectionList(&u8g2,"设置熄屏时间", 1, buf);
         switch (current_selection)
         {
@@ -1373,7 +1373,7 @@ void oledViAllShow()
 {
   uint16_t c1CurRevise = sw35xx_c1.OutCur * C1REVISE;
   uint16_t c2CurRevise = sw35xx_c2.OutCur * C2REVISE;
-  char buf[20] = {0};
+  char buf[32] = {0};
   u8g2_SetFont(&u8g2, u8g2_font_wqy13_t_gb2312);
   u8g2_SetFontRefHeightAll(&u8g2);
   u8g2_ClearBuffer(&u8g2);
@@ -1381,9 +1381,11 @@ void oledViAllShow()
   u8g2_DrawUTF8(&u8g2, 0, 16, buf);
   sprintf(buf, "C2口 %d.%03dV %d.%03dA", (sw35xx_c2.OutVol * 6) / 1000, (sw35xx_c2.OutVol * 6) % 1000, (c2CurRevise * 25 / 10) / 1000, (c2CurRevise * 25 / 10) % 1000);
   u8g2_DrawUTF8(&u8g2, 0, 32, buf);
-  sprintf(buf, "A1口 %d.%03dV", (ADC[0]) / 1000, (ADC[0]) % 1000);
+  uint32_t adc_values[2];
+  ADC_getVoltage(adc_values);  // 获取电压值
+  sprintf(buf, "A1口 %ld.%03ldV", adc_values[0] / 1000, adc_values[0] % 1000);
   u8g2_DrawUTF8(&u8g2, 0, 48, buf);
-  sprintf(buf, "A2口 %d.%03dV", (ADC[1]) / 1000, (ADC[1]) % 1000);
+  sprintf(buf, "A1口 %ld.%03ldV", adc_values[1] / 1000, adc_values[1] % 1000);
   u8g2_DrawUTF8(&u8g2, 0, 64, buf);
   u8g2_DrawUTF8(&u8g2, 90, 48, "VIN");
   sprintf(buf, "%6.3fV", ((double)sw35xx_c1.InVol) / 100);
@@ -1420,7 +1422,7 @@ void findChange(double c1POld, double c2POld, uint8_t *Mode)
 void oledChargePower(uint8_t event)
 {
  
-  char buf[20] = {0};
+  char buf[32] = {0};
   u8g2_SetFont(&u8g2, u8g2_font_wqy13_t_gb2312);
   u8g2_SetFontRefHeightAll(&u8g2);
   u8g2_ClearBuffer(&u8g2);

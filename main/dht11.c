@@ -12,6 +12,8 @@
 #include "driver/uart.h"
 #include "driver/gpio.h"
 #include "string.h"
+#include "esp_rom_gpio.h"
+#include "esp_rom_sys.h"
  
 #define DHT11_PIN   21//定义DHT11的引脚
  
@@ -28,20 +30,20 @@ uchar ucharcomdata;
  
 static void InputInitial(void)//设置端口为输入
 {
-  gpio_pad_select_gpio(DHT11_PIN);
+  esp_rom_gpio_pad_select_gpio(DHT11_PIN);
   gpio_set_direction(DHT11_PIN, GPIO_MODE_INPUT);
 }
  
 static void OutputHigh(void)//输出1
 {
-  gpio_pad_select_gpio(DHT11_PIN);
+  esp_rom_gpio_pad_select_gpio(DHT11_PIN);
   gpio_set_direction(DHT11_PIN, GPIO_MODE_OUTPUT);
   gpio_set_level(DHT11_PIN, 1);
 }
  
 static void OutputLow(void)//输出0
 {
-  gpio_pad_select_gpio(DHT11_PIN);
+  esp_rom_gpio_pad_select_gpio(DHT11_PIN);
   gpio_set_direction(DHT11_PIN, GPIO_MODE_OUTPUT);
   gpio_set_level(DHT11_PIN, 0);
 }
@@ -59,8 +61,8 @@ static void COM(void)    // 温湿写入
     {
         ucharFLAG=2;
         //等待IO口变低，变低后，通过延时去判断是0还是1
-        while((getData()==0)&&ucharFLAG++) ets_delay_us(10);
-        ets_delay_us(35);//延时35us
+        while((getData()==0)&&ucharFLAG++) esp_rom_delay_us(10);
+        esp_rom_delay_us(35);//延时35us
         uchartemp=0;
  
         //如果这个位是1，35us后，还是1，否则为0
@@ -70,7 +72,7 @@ static void COM(void)    // 温湿写入
  
         //等待IO口变高，变高后，表示可以读取下一位
         while((getData()==1)&&ucharFLAG++) 
-          ets_delay_us(10);
+          esp_rom_delay_us(10);
         if(ucharFLAG==1)
           break;
         ucharcomdata<<=1;
@@ -82,7 +84,7 @@ void Delay_ms(uint16 ms)
 {
 	int i=0;
 	for(i=0; i<ms; i++){
-		ets_delay_us(1000);
+		esp_rom_delay_us(1000);
 	}
 }
  
@@ -92,17 +94,17 @@ int DHT11(void)   //温湿传感启动
     Delay_ms(19);  //>18MS
     OutputHigh();
     InputInitial(); //输入
-    ets_delay_us(30);
+    esp_rom_delay_us(30);
     if(!getData())//表示传感器拉低总线
     {
         ucharFLAG=2;
         //等待总线被传感器拉高
         while((!getData())&&ucharFLAG++) 
-          ets_delay_us(10);
+          esp_rom_delay_us(10);
         ucharFLAG=2;
         //等待总线被传感器拉低
         while((getData())&&ucharFLAG++) 
-          ets_delay_us(10);
+          esp_rom_delay_us(10);
         COM();//读取第1字节，
         ucharRH_data_H_temp=ucharcomdata;
         COM();//读取第2字节，

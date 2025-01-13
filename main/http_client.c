@@ -21,7 +21,7 @@
 #include "esp_tls.h"
 #include "esp_crt_bundle.h"
 #include "menu.h"
-#include "mqtt.h"
+// #"mqtt.h"
 #include "menu.h"
 
 #include "esp_http_client.h"
@@ -50,7 +50,8 @@ esp_err_t _http_event_handler(esp_http_client_event_t *evt)
 {
     static char *output_buffer;  // Buffer to store response of http request from event handler
     static int output_len;       // Stores number of bytes read
-    switch(evt->event_id) {
+
+    switch (evt->event_id) {
         case HTTP_EVENT_ERROR:
             ESP_LOGD(TAG, "HTTP_EVENT_ERROR");
             break;
@@ -86,7 +87,6 @@ esp_err_t _http_event_handler(esp_http_client_event_t *evt)
                 }
                 output_len += evt->data_len;
             }
-
             break;
         case HTTP_EVENT_ON_FINISH:
             ESP_LOGD(TAG, "HTTP_EVENT_ON_FINISH");
@@ -112,10 +112,15 @@ esp_err_t _http_event_handler(esp_http_client_event_t *evt)
             }
             output_len = 0;
             break;
+        case HTTP_EVENT_REDIRECT:
+            ESP_LOGD(TAG, "HTTP_EVENT_REDIRECT: Redirecting to %s", (char *)evt->data);
+            break;
+        default:
+            ESP_LOGD(TAG, "Unknown HTTP event: %d", evt->event_id);
+            break;
     }
     return ESP_OK;
 }
-
 int findMenu(const char * menu, char *buffer)
 {
     int mLen = strlen(menu);

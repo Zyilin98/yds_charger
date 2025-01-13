@@ -14,7 +14,7 @@
 #include "esp_system.h"
 #include "esp_log.h"
 #include "sdkconfig.h"
-
+#include "esp_adc/adc_oneshot.h"
 #include "adc_read.h"
 #include "lis3dh.h"
 //#include "led_strip.h"
@@ -37,22 +37,48 @@ void dht11Task(void *pvParameters)
   vTaskDelete(NULL);
 }
 
+
+// 定义 ADC 句柄和通道
+static adc_oneshot_unit_handle_t adc_handle = NULL;
+static adc_channel_t adc_channel_0 = ADC_CHANNEL_0;  // 根据实际硬件选择通道
+static adc_channel_t adc_channel_1 = ADC_CHANNEL_1;  // 根据实际硬件选择通道
+
 void adcTask(void *pvParameters)
 {
+  // 初始化 ADC 单元
+  adc_oneshot_unit_init_cfg_t init_config = {
+    .unit_id = ADC_UNIT_1,  // 根据实际硬件选择 ADC_UNIT_1 或 ADC_UNIT_2
+};
+  adc_oneshot_new_unit(&init_config, &adc_handle);
+
+  // 配置 ADC 通道
+  adc_oneshot_chan_cfg_t channel_config = {
+    .bitwidth = ADC_BITWIDTH_DEFAULT,
+    .atten = ADC_ATTEN_DB_11,  // 根据实际需求选择衰减值
+};
+  adc_oneshot_config_channel(adc_handle, adc_channel_0, &channel_config);
+  adc_oneshot_config_channel(adc_handle, adc_channel_1, &channel_config);
+
   for (;;)
   {
-    ADC_getVoltage(ADC);
-    if(aPortLed == 0)
+    int adc_value_0, adc_value_1;
+
+    // 读取 ADC 值
+    adc_oneshot_read(adc_handle, adc_channel_0, &adc_value_0);
+    adc_oneshot_read(adc_handle, adc_channel_1, &adc_value_1);
+
+    if (aPortLed == 0)
     {
-      if(OledProtectBegin == 0)
+      if (OledProtectBegin == 0)
       {
         rgbOn[3] = 1;
         rgbOn[2] = 1;
       }
       else
       {
-      rgbOn[3] = ADC[0] / 1000 > 6 ? 1 : 0;
-      rgbOn[2] = ADC[1] / 1000 > 6 ? 1 : 0;
+        // 根据 ADC 值设置 RGB 状态
+        rgbOn[3] = adc_value_0 / 1000 > 6 ? 1 : 0;
+        rgbOn[2] = adc_value_1 / 1000 > 6 ? 1 : 0;
       }
     }
     else
@@ -63,6 +89,10 @@ void adcTask(void *pvParameters)
 
     vTaskDelay(pdMS_TO_TICKS(200));
   }
+
+  // 释放 ADC 资源
+  adc_oneshot_del_unit(adc_handle);
+
   vTaskDelete(NULL);
 }
 
@@ -136,7 +166,7 @@ void ws28xxTask(void *pvParameters)
   }
 }
 
-void lis3dhTask(void *pvParameters)
+/* void lis3dhTask(void *pvParameters)
 {
   uint8_t buffer1,buffer2;
   uint16_t X_V,Y_V,Z_V;
@@ -156,7 +186,7 @@ void lis3dhTask(void *pvParameters)
     vTaskDelay(pdMS_TO_TICKS(40));
   }
 }
-
+*/
 /*void ntpClockTask(void *pvParameters){
   for (;;){
     vTaskDelay(pdMS_TO_TICKS(5000));

@@ -37,7 +37,7 @@
 
 #include "task.h"
 #include "http_client.h"
-#include "mqtt.h"
+// #include "mqtt.h"
 
 static const char *TAG = "main";
 #define RMT_TX_CHANNEL RMT_CHANNEL_0
@@ -244,13 +244,13 @@ void nvsRead(void)
 
 void GPIO_Init(void){
   //Input GPIO
-  gpio_pad_select_gpio(8);
+  esp_rom_gpio_pad_select_gpio(8);
   gpio_set_direction(8, GPIO_MODE_INPUT);
   gpio_set_pull_mode(8,GPIO_PULLUP_ONLY);
-  gpio_pad_select_gpio(9);
+  esp_rom_gpio_pad_select_gpio(9);
   gpio_set_direction(9, GPIO_MODE_INPUT);
   gpio_set_pull_mode(9,GPIO_PULLUP_ONLY);
-  gpio_pad_select_gpio(10);
+  esp_rom_gpio_pad_select_gpio(10);
   gpio_set_direction(10, GPIO_MODE_INPUT);
   gpio_set_pull_mode(10,GPIO_PULLUP_ONLY);
 
@@ -259,19 +259,19 @@ void GPIO_Init(void){
     gpio_config_t io_conf;
     io_conf.pin_bit_mask = 1ULL<< 21;
     io_conf.mode = GPIO_MODE_INPUT_OUTPUT;
-    io_conf.intr_type = GPIO_PIN_INTR_DISABLE;
+    io_conf.intr_type = GPIO_INTR_DISABLE;
     io_conf.pull_down_en = 0;
     io_conf.pull_up_en = 0;
     gpio_config(&io_conf);
   }
   else
   {
-    gpio_pad_select_gpio(20);
+    esp_rom_gpio_pad_select_gpio(20);
     gpio_set_direction(20, GPIO_MODE_OUTPUT);
     gpio_set_level(20, 1);
     
     //Output GPIO
-    gpio_pad_select_gpio(21);
+    esp_rom_gpio_pad_select_gpio(21);
     gpio_set_direction(21, GPIO_MODE_OUTPUT);
     gpio_set_level(21, 1);
   }

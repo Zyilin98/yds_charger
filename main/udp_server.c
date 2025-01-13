@@ -26,7 +26,7 @@
 #include <adc_read.h>
 #include "http_client.h"
 #include "menu.h"
-#include "mqtt.h"
+// #include "mqtt.h"
 
 #define PORT 8000
 #define CONFIG_EXAMPLE_IPV4
@@ -91,21 +91,28 @@ int URLEncode(const char* str, const int strSize, char* result, const int result
 
 void udp_txvi(void *pvParameters)
 {
-    while(1)
+    while (1)
     {
-        vTaskDelay(300);
-        if(flag == 1)
+        vTaskDelay(300);  // 延迟 300ms
+        if (flag == 1)
         {
-            char tx_buffer[40];
-            sprintf(tx_buffer, "%.3f#%.3f#%.3f#%.3f#%.3f#%.3f", ((double)sw35xx_c1.OutVol * 6) / 1000, ((double)sw35xx_c1.OutCur * 25 / 10) / 1000, \
-                                                        ((double)sw35xx_c2.OutVol * 6) / 1000, ((double)sw35xx_c2.OutCur * 25 / 10) / 1000, \
-                                                        ((double)ADC[0]) / 1000, ((double)ADC[1]) / 1000);
+            uint32_t adc_values[2];  // 定义数组存储 ADC 电压值
+            ADC_getVoltage(adc_values);  // 获取 ADC 电压值
+
+            char tx_buffer[256];
+            sprintf(tx_buffer, "%.3f#%.3f#%.3f#%.3f#%.3f#%.3f",
+                    ((double)sw35xx_c1.OutVol * 6) / 1000,
+                    ((double)sw35xx_c1.OutCur * 25 / 10) / 1000,
+                    ((double)sw35xx_c2.OutVol * 6) / 1000,
+                    ((double)sw35xx_c2.OutCur * 25 / 10) / 1000,
+                    ((double)adc_values[0]) / 1000,  // 使用 adc_values[0]
+                    ((double)adc_values[1]) / 1000); // 使用 adc_values[1]
+
             int txLen = strlen(tx_buffer);
             int err = sendto(sock, tx_buffer, txLen, 0, (struct sockaddr *)&source_addr, sizeof(source_addr));
             if (err < 0) {
                 ESP_LOGE(TAG, "Error occurred during sending: errno %d", errno);
-            }
-            else{
+            } else {
                 ESP_LOGI(TAG, "SEND SUCCESS");
             }
         }
@@ -187,6 +194,7 @@ void udp_server_task(void *pvParameters)
                 if(cutString("city", urlCity, rx_buffer) == 0)
                 {
                     int re = URLEncode(urlCity, strlen(urlCity), city, sizeof(city));
+                    ESP_LOGI(TAG, "URLEncode result: %d", re);  // 如果需要日志输出
                     
                     ESP_LOGI("CITY", "CITY = %s", city);
                     
@@ -234,16 +242,38 @@ void udp_server_task(void *pvParameters)
                 }
                 nvsWrite();
 
-                char tx_buffer[40];
-                sprintf(tx_buffer, "\nC1 %6.3fW %6.3fV %.3fA \nC2 %6.3fW %6.3fV %.3fA\nA1 %6.3fV  A2 %6.3fV\nVIN %6.3fV\n%3d %3d %3d %3d %2d %2d %2d %2d %d %d %d %4.1f", ((double)sw35xx_c1.OutVol * 6) / 1000 * ((double)sw35xx_c1.OutCur * 25 / 10) / 1000,((double)sw35xx_c1.OutVol * 6) / 1000, ((double)sw35xx_c1.OutCur * 25 / 10) / 1000, \
-                                                            ((double)sw35xx_c2.OutVol * 6) / 1000 * ((double)sw35xx_c2.OutCur * 25 / 10) / 1000, ((double)sw35xx_c2.OutVol * 6) / 1000, ((double)sw35xx_c2.OutCur * 25 / 10) / 1000, \
-                                                            ((double)ADC[0]) / 1000, ((double)ADC[1]) / 1000, ((double)sw35xx_c1.InVol) / 100, light, rgbProportion[0], rgbProportion[1], rgbProportion[2], sw35xx_c1.protocol, sw35xx_c1.pdversion, sw35xx_c2.protocol, sw35xx_c2.pdversion, sw35xx_c1.state.tem_alarm_upmax, sw35xx_c2.state.tem_alarm_upmax, \
-                                                            Humi,Temp + 0.1 * Temp_small);
+                char tx_buffer[256];
+                uint32_t adc_values[2];  // 定义数组存储 ADC 电压值
+                ADC_getVoltage(adc_values);  // 获取 ADC 电压值
+
+                snprintf(tx_buffer, sizeof(tx_buffer), "\nC1 %6.3fW %6.3fV %.3fA \nC2 %6.3fW %6.3fV %.3fA\nA1 %6.3fV  A2 %6.3fV\nVIN %6.3fV\n%3d %3d %3d %3d %2d %2d %2d %2d %d %d %d %4.1f",
+                                ((double)sw35xx_c1.OutVol * 6) / 1000 * ((double)sw35xx_c1.OutCur * 25 / 10) / 1000,
+                                ((double)sw35xx_c1.OutVol * 6) / 1000,
+                                ((double)sw35xx_c1.OutCur * 25 / 10) / 1000,
+                                ((double)sw35xx_c2.OutVol * 6) / 1000 * ((double)sw35xx_c2.OutCur * 25 / 10) / 1000,
+                                ((double)sw35xx_c2.OutVol * 6) / 1000,
+                                ((double)sw35xx_c2.OutCur * 25 / 10) / 1000,
+                                ((double)adc_values[0]) / 1000,  // 使用 adc_values[0]
+                                ((double)adc_values[1]) / 1000,  // 使用 adc_values[1]
+                                ((double)sw35xx_c1.InVol) / 100,
+                                light,
+                                rgbProportion[0],
+                                rgbProportion[1],
+                                rgbProportion[2],
+                                sw35xx_c1.protocol,
+                                sw35xx_c1.pdversion,
+                                sw35xx_c2.protocol,
+                                sw35xx_c2.pdversion,
+                                sw35xx_c1.state.tem_alarm_upmax,
+                                sw35xx_c2.state.tem_alarm_upmax,
+                                Humi,
+                                Temp + 0.1 * Temp_small);
+
                 printf("c1 tem: %6f\n", sw35xx_c1.tem);
-                 printf("c2 tem: %6f\n", sw35xx_c2.tem);
+                printf("c2 tem: %6f\n", sw35xx_c2.tem);
+
                 int txLen = strlen(tx_buffer);
                 int err = sendto(sock, tx_buffer, txLen, 0, (struct sockaddr *)&source_addr, sizeof(source_addr));
-
                 //sendto(sock, tiaoshi, strlen(sendudp), 0, (struct sockaddr *)&source_addr, sizeof(source_addr));
                 if (err < 0) {
                     ESP_LOGE(TAG, "Error occurred during sending: errno %d", errno);

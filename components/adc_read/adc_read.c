@@ -5,8 +5,8 @@
 #include "esp_log.h"
 #include "adc_read.h"
 
-static const char *TAG = "adc_read";
-adc_cali_handle_t cali_handle;
+//static const char *TAG = "adc_read"; // 如果需要日志，保留；否则删除
+adc_cali_handle_t cali_handle = NULL;
 
 static void print_char_val_type(esp_err_t cali_status)
 {
@@ -19,18 +19,29 @@ static void print_char_val_type(esp_err_t cali_status)
 
 void ADC_Init(void)
 {
+    // Initialize ADC calibration
     adc_cali_curve_fitting_config_t cali_config = {
+        .unit_id = unit,
         .atten = atten1,
-        .bitwidth = width
+        .bitwidth = width,
     };
 
     esp_err_t cali_status = adc_cali_create_scheme_curve_fitting(&cali_config, &cali_handle);
     print_char_val_type(cali_status);
 
+    // Configure ADC
     if (unit == ADC_UNIT_1) {
-        adc1_config_width(width);
-        adc1_config_channel_atten(channel1, atten1);
-        adc1_config_channel_atten(channel2, atten2);
+        adc_oneshot_unit_init_cfg_t init_config = {
+            .unit_id = unit,
+        };
+        adc_oneshot_new_unit(&init_config, &adc1_handle);
+
+        adc_oneshot_chan_cfg_t chan_config = {
+            .atten = atten1,
+            .bitwidth = width,
+        };
+        adc_oneshot_config_channel(adc1_handle, channel1, &chan_config);
+        adc_oneshot_config_channel(adc1_handle, channel2, &chan_config);
     }
 }
 
@@ -38,12 +49,13 @@ void ADC_getVoltage(uint32_t *adcdate)
 {
     uint32_t adc_reading[2] = {0};
     for (int i = 0; i < NO_OF_SAMPLES; i++) {
-        adc_reading[0] += adc1_get_raw((adc1_channel_t)channel1);
-        adc_reading[1] += adc1_get_raw((adc1_channel_t)channel2);
+        adc_oneshot_read(adc1_handle, channel1, (int *)&adc_reading[0]);
+        adc_oneshot_read(adc1_handle, channel2, (int *)&adc_reading[1]);
     }
     adc_reading[0] /= NO_OF_SAMPLES;
     adc_reading[1] /= NO_OF_SAMPLES;
 
+    // Convert raw ADC readings to voltage (mV)
     int voltage;
     adc_cali_raw_to_voltage(cali_handle, adc_reading[0], &voltage);
     *adcdate = voltage;
