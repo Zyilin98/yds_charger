@@ -17,7 +17,7 @@
 #include "esp_log.h"
 #include "esp_attr.h"
 #include "led_strip.h"
-#include "driver/rmt.h"
+#include "driver/rmt_tx.h"
 
 #define RMT_TX_CHANNEL RMT_CHANNEL_0
 

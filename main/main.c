@@ -26,7 +26,7 @@
 #include "led_strip.h"
 #include "sw3526.h"
 #include "led_strip.h"
-#include "driver/rmt.h"
+#include "driver/rmt_tx.h"
 #include <driver/gpio.h>
 #include "menu.h"
 #include "u8g2_esp32_hal.h"
@@ -38,6 +38,14 @@
 #include "task.h"
 #include "http_client.h"
 // #include "mqtt.h"
+
+TaskHandle_t ntpTask_handle = NULL;
+TaskHandle_t oledTask_handle = NULL;
+TaskHandle_t lis3dhtask_handle = NULL;
+TaskHandle_t ws28xxTask_handle = NULL;
+TaskHandle_t sw35xxTask_handle = NULL;
+TaskHandle_t adcTask_handle = NULL;
+int OTA_FLAG = 0;
 
 static const char *TAG = "main";
 #define RMT_TX_CHANNEL RMT_CHANNEL_0
@@ -390,6 +398,7 @@ void ALL_Init(void){
 void app_main(void)
 {
   ALL_Init();
+  ADC_Init();
   for (;;)
   {
     vTaskDelay(pdMS_TO_TICKS(1000));

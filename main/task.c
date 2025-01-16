@@ -26,6 +26,14 @@ extern int16_t rgbProportion[3];
 extern int16_t light;
 int8_t rgbOn[4] = {0};
 
+extern TaskHandle_t ntpTask_handle;
+extern TaskHandle_t oledTask_handle;
+extern TaskHandle_t lis3dhtask_handle;
+extern TaskHandle_t ws28xxTask_handle;
+extern TaskHandle_t sw35xxTask_handle;
+extern TaskHandle_t adcTask_handle;
+extern int OTA_FLAG;
+
 void dht11Task(void *pvParameters)
 {
   for(;;)
@@ -54,7 +62,7 @@ void adcTask(void *pvParameters)
   // 配置 ADC 通道
   adc_oneshot_chan_cfg_t channel_config = {
     .bitwidth = ADC_BITWIDTH_DEFAULT,
-    .atten = ADC_ATTEN_DB_11,  // 根据实际需求选择衰减值
+    .atten = ADC_ATTEN_DB_12,  // 根据实际需求选择衰减值
 };
   adc_oneshot_config_channel(adc_handle, adc_channel_0, &channel_config);
   adc_oneshot_config_channel(adc_handle, adc_channel_1, &channel_config);
