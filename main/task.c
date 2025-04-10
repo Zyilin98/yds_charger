@@ -65,7 +65,6 @@ void adcTask(void *pvParameters)
   }
   vTaskDelete(NULL);
 }
-
 void sw35xxTask(void *pvParameters)
 {
   for (;;)
@@ -74,21 +73,21 @@ void sw35xxTask(void *pvParameters)
     SW35XXUpdate();
     double c1P = ((double)sw35xx_c1.OutVol * 6) * ((double)sw35xx_c1.OutCur * 25 / 10) / 1000000;
     double c2P = ((double)sw35xx_c2.OutVol * 6) * ((double)sw35xx_c2.OutCur * 25 / 10) / 1000000;
-    if(c1P > 0.3)
+    if(c1P > 0.2)
     {
       rgbOn[0] = 1;
     }
-    else if(c1P < 0.2)
+    else if(c1P < 0.1)
     {
       rgbOn[0] = 0;
     }
 
 
-    if(c2P > 0.3)
+    if(c2P > 0.2)
     {
       rgbOn[1] = 1;
     }
-    else if(c2P < 0.2)
+    else if(c2P < 0.1)
     {
       rgbOn[1] = 0;
     }
@@ -136,7 +135,7 @@ void ws28xxTask(void *pvParameters)
   }
 }
 
-void lis3dhTask(void *pvParameters)
+/*void lis3dhTask(void *pvParameters)
 {
   uint8_t buffer1,buffer2;
   uint16_t X_V,Y_V,Z_V;
@@ -156,7 +155,7 @@ void lis3dhTask(void *pvParameters)
     vTaskDelay(pdMS_TO_TICKS(40));
   }
 }
-
+*/
 /*void ntpClockTask(void *pvParameters){
   for (;;){
     vTaskDelay(pdMS_TO_TICKS(5000));
@@ -177,9 +176,9 @@ void taskMonitor(void *pvParameters){
     uxHighWaterMark = uxTaskGetStackHighWaterMark(ws28xxTask_handle);
     printf("Task: ws28xxTask_handle stacksize=%d\r\n",uxHighWaterMark);
 
-    uxHighWaterMark = uxTaskGetStackHighWaterMark(lis3dhtask_handle);
+    /*uxHighWaterMark = uxTaskGetStackHighWaterMark(lis3dhtask_handle);
     printf("Task: lis3dhtask_handle stacksize=%d\r\n",uxHighWaterMark);
-
+*/
     uxHighWaterMark = uxTaskGetStackHighWaterMark(oledTask_handle);
     printf("Task: oledTask_handle stacksize=%d\r\n",uxHighWaterMark);
 

@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 3.5)
 
 #版本号
-set(PROJECT_VER "1.6.7")
+set(PROJECT_VER "1.6.8")
 
 set(EXTRA_COMPONENT_DIRS $ENV{IDF_PATH}/examples/common_components/protocol_examples_common)
 

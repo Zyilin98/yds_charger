@@ -1398,7 +1398,7 @@ void findChange(double c1POld, double c2POld, uint8_t *Mode)
     double c2P = ((double)sw35xx_c2.OutVol * 6) * ((double)sw35xx_c2.OutCur * 25 / 10) / 1000000;
 
 
-    if((c1P > 0.3 && c1POld < 0.2) || (c1P < 0.2 && c1POld > 0.3) || (c2P > 0.3 && c2POld < 0.2) || (c2P < 0.2 && c2POld > 0.3))
+    if((c1P > 0.2 && c1POld < 0.1) || (c1P < 0.1 && c1POld > 0.2) || (c2P > 0.2 && c2POld < 0.1) || (c2P < 0.1 && c2POld > 0.2))
     {
       if(OledProtectBegin == 1)
       {
