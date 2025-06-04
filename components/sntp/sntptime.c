@@ -1,8 +1,8 @@
 /*
  * @Author: [LiaoZhelin]
  * @Date: 2022-06-14 11:31:37
- * @LastEditors: [LiaoZhelin]
- * @LastEditTime: 2022-06-14 13:47:18
+ * @LastEditors: [Zyilin98]
+ * @LastEditTime: 2025-06-04 10:12:23
  * @Description: 
  */
 #include <stdio.h>
@@ -45,7 +45,7 @@ void SNTP_Init(void)
     struct tm timeinfo;
     time(&now);
     localtime_r(&now, &timeinfo);
-    if (timeinfo.tm_year < (2016 - 1900)) {
+    if (timeinfo.tm_year < (2024 - 1900)) {
         ESP_LOGI(TAG, "Time is not set yet. Connecting to WiFi and getting time over NTP.");
         obtain_time();
         // update 'now' variable with current time
@@ -71,7 +71,7 @@ void SNTP_Init(void)
     }
 
     char strftime_buf[64];
-    setenv("TZ", "CST-8", 1);
+    setenv("TZ", "GMT+8", 1);
     tzset();
     localtime_r(&now, &timeinfo);
     strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
@@ -134,7 +134,9 @@ static void initialize_sntp(void)
 {
     ESP_LOGI(TAG, "Initializing SNTP");
     sntp_setoperatingmode(SNTP_OPMODE_POLL);
-    sntp_setservername(0, "pool.ntp.org");
+    sntp_setservername(0, "ntp.aliyun.com");
+    sntp_setservername(1, "ntp.tencent.com");		// 国家授时中心服务器 IP 地址
+    sntp_setservername(2, "210.72.145.44");
     sntp_set_time_sync_notification_cb(time_sync_notification_cb);
 
     sntp_set_sync_mode(SNTP_SYNC_MODE_SMOOTH);
