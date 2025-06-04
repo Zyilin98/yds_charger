@@ -319,7 +319,7 @@ void ALL_Init(void){
   oledInitMessageTask(2,"OK");
   vTaskDelay(pdMS_TO_TICKS(200));
   oledInitMessageTask(3,"");
-  LIS3DH_Init();// No init I2C
+  //LIS3DH_Init();// No init I2C
   oledInitMessageTask(3,"OK");
   vTaskDelay(pdMS_TO_TICKS(200));
   
