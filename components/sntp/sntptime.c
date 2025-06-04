@@ -71,7 +71,7 @@ void SNTP_Init(void)
     }
 
     char strftime_buf[64];
-    setenv("TZ", "GMT+8", 1);
+    setenv("TZ", "UTC-8", 1);
     tzset();
     localtime_r(&now, &timeinfo);
     strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
