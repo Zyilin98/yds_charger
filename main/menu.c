@@ -23,7 +23,7 @@
 #include "esp_wifi.h"
 #include "wifi.h"
 #include "esp_netif.h"
-#include <tcpip_adapter.h>
+//#include <tcpip_adapter.h>
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -396,7 +396,7 @@ void nvsWriteOledOffTimeEnd()
 static void oledWifiShowTask(void)
 {
   wifi_ap_record_t ap;
-  tcpip_adapter_ip_info_t ipInfo;
+  esp_netif_ip_info_t ipInfo;
   for (;;)
   {
     char buf[20] = {0};
@@ -404,7 +404,7 @@ static void oledWifiShowTask(void)
       esp_err_t err = esp_netif_get_ip_info(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"), &ipInfo); 
    
     char ip_Str[16] = {0};
-    esp_ip4addr_ntoa(&ipInfo.ip, ip_Str, sizeof(ip_Str));
+    esp_ip4addr_ntoa(&(ipInfo.ip), ip_Str, sizeof(ip_Str));
     uint8_t event = u8x8_GetMenuEvent(u8g2_GetU8x8(&u8g2));
     u8g2_ClearBuffer(&u8g2);
     sprintf(buf, "SSID名称: %s", ap.ssid);
