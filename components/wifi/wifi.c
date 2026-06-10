@@ -32,6 +32,9 @@ static EventGroupHandle_t s_wifi_event_group;
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAIL_BIT BIT1
 #define ESPTOUCH_DONE_BIT BIT2
+#define SC_TIMEOUT_BIT BIT3
+
+#define SMARTCONFIG_TIMEOUT_MS 120000
 
 static const char *TAG = "wifi station";
 
@@ -228,13 +231,21 @@ uint8_t wifi_init_sta(uint8_t mode)
         esp_wifi_start();
         xTaskCreate(smartconfig_example_task, "smartconfig_example_task", 4096, NULL, 3, NULL); //开始配网
         bits = xEventGroupWaitBits(s_wifi_event_group,
-                                   ESPTOUCH_DONE_BIT,
+                                   ESPTOUCH_DONE_BIT | SC_TIMEOUT_BIT,
                                    pdFALSE,
                                    pdFALSE,
                                    portMAX_DELAY);
 
-        ESP_LOGI(TAG, "CONFIG SUCCESS!!");
-        err = 1;
+        if (bits & ESPTOUCH_DONE_BIT)
+        {
+            ESP_LOGI(TAG, "CONFIG SUCCESS!!");
+            err = 1;
+        }
+        else
+        {
+            ESP_LOGI(TAG, "CONFIG TIMEOUT, smartconfig not completed");
+            err = 0;
+        }
         ESP_ERROR_CHECK(esp_event_handler_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, &event_handler));
         ESP_ERROR_CHECK(esp_event_handler_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, &event_handler));
         ESP_ERROR_CHECK(esp_event_handler_unregister(SC_EVENT, ESP_EVENT_ANY_ID, &event_handler));
@@ -255,18 +266,20 @@ static void smartconfig_example_task(void *parm)
     ESP_ERROR_CHECK(esp_smartconfig_start(&cfg));
     while (1)
     {
-        // 阻塞,等待智能配网完成
-        uxBits = xEventGroupWaitBits(s_wifi_event_group, ESPTOUCH_DONE_BIT, true, false, portMAX_DELAY);
-        // 直接连接,无配网
-        // if (uxBits & WIFI_CONNECTED_BIT)
-        // {
-        //     ESP_LOGI(TAG, "WiFi Connected to ap");
-        // }
-        // 智能配网完成,打印信息,关闭智能配网,然后删除这个task
+        uxBits = xEventGroupWaitBits(s_wifi_event_group, ESPTOUCH_DONE_BIT, true, false,
+                                     pdMS_TO_TICKS(SMARTCONFIG_TIMEOUT_MS));
         if (uxBits & ESPTOUCH_DONE_BIT)
         {
             ESP_LOGI(TAG, "smartconfig over");
             esp_smartconfig_stop();
+            vTaskDelete(NULL);
+        }
+        else
+        {
+            // 超时，通知外层退出等待
+            ESP_LOGW(TAG, "smartconfig timeout after %d ms", SMARTCONFIG_TIMEOUT_MS);
+            esp_smartconfig_stop();
+            xEventGroupSetBits(s_wifi_event_group, SC_TIMEOUT_BIT);
             vTaskDelete(NULL);
         }
     }
